@@ -102,6 +102,12 @@ Because the exact 51 column names aren't confirmed until the file lands, ingesti
 
 Load fails loudly if a required logical field can't be mapped. Literal `"null"` / `"[]"` strings are normalized to SQL NULL at bronze→silver (confirmed gotcha from proxy inspection).
 
+**Authoritative schema (from the VF starter materials, `data/starter_materials/`):** the dataset is produced by the `Facility` pydantic model (`facility_and_ngo_fields.py`) + `FacilityFacts` (`free_form.py`) + `MedicalSpecialties` (`medical_specialties.py`). Confirmed semantics:
+- `facilityTypeId ∈ {hospital, pharmacy, doctor, clinic, dentist}`; `operatorTypeId ∈ {public, private}`; `affiliationTypeIds ⊂ {faith-tradition, philanthropy-legacy, community, academic, government}`.
+- `capability`, `procedure`, `equipment` are free-text `list[str]`; **`capability` is already semi-structured** (e.g. `"Level III NICU"`, `"24/7 emergency care"`, `"Joint Commission accredited"`) — our taxonomy extraction maps these, and every fact is pipeline-guaranteed traceable to source text.
+- `specialties` is a **controlled camelCase vocabulary** (`MEDICAL_HIERATCHY`). Relevant mappings: trauma→`criticalCareMedicine`, oncology→`medicalOncology`, NICU→`neonatologyPerinatalMedicine`, maternity→`gynecologyAndObstetrics`, dialysis→`nephrology`, and **`anesthesia`** is a first-class specialty.
+- New fields vs old 41-col: `area` (floor m²), `acceptsVolunteers`, `logo`, NGO fields (`countries`, `missionStatement`, …). `source_urls` is referenced by the brief/Marketplace but NOT in the base schema doc → treat as FDR-added; confirm on load.
+
 ### 5.2 Medallion pipeline (ported, re-run on new data)
 - **bronze.facilities_raw** — new dataset via Volume → `COPY INTO`, all STRING.
 - **silver.facilities** — cleaned/typed; `"null"`/`"[]"` → NULL; `specialties` parsed to array; geography retained for PIN join.
@@ -111,7 +117,7 @@ Load fails loudly if a required logical field can't be mapped. Literal `"null"` 
 - **gold.pincode_capability_gaps** — extended with the three-state classification (§7).
 
 ### 5.3 Trust scorer — recalibrate, don't redesign
-Keep the 4 layers: (1) ~12 hard SQL penalty rules, (2) coverage score, (3) anomaly flags (junk-corporate ~4.5% in proxy, geo-outlier, short-desc), (4) two-agent validator dataset pass. **Recalibration needed** because the new data is far denser (equipment 16%→77%, capacity 1%→25%): coverage-based penalties and the desert cutoffs were tuned for sparse data and will over/under-fire otherwise. Exploit the clean `specialties` field as corroboration (e.g., oncology claim + `oncology` in specialties ⇒ weaker "unsupported specialty" penalty). Thresholds are set against **real** coverage histograms once the dataset loads.
+Keep the 4 layers: (1) ~12 hard SQL penalty rules, (2) coverage score, (3) anomaly flags (junk-corporate ~4.5% in proxy, geo-outlier, short-desc), (4) two-agent validator dataset pass. **Recalibration needed** because the new data is far denser (equipment 16%→77%, capacity 1%→25%): coverage-based penalties and the desert cutoffs were tuned for sparse data and will over/under-fire otherwise. Exploit the controlled `specialties` vocabulary as concrete corroboration: surgery `procedure` + no `anesthesia` specialty ⇒ penalty (old rule p1); oncology capability + `medicalOncology` ⇒ confirmed; ICU/NICU + `criticalCareMedicine`/`neonatologyPerinatalMedicine` ⇒ confirmed; dialysis + `nephrology` ⇒ confirmed. Thresholds are set against **real** coverage histograms once the dataset loads.
 
 ---
 

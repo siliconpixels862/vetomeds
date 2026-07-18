@@ -5,3 +5,12 @@ node_modules/
 *.log
 .databricks/
 __pycache__/
+
+# Large raw data blobs (keep out of git; acquire per README/spec)
+data/*.xls
+data/*.xlsx
+data/*.csv
+data/*.parquet
+data/*.zip
+**/.DS_Store
+**/__MACOSX/
