@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  /* Base surfaces — white with a very subtle cool wash */
+  --bg: #f8fbfe;
+  --surface: #ffffff;
+  --border: rgb(226 232 240 / 0.7);      /* slate-200/70 */
+  --border-strong: #cbd5e1;              /* slate-300 */
+  --text: #0f172a;                       /* slate-900 */
+  --text-muted: #475569;                 /* slate-600 */
+  --text-subtle: #64748b;                /* slate-500 */
+
+  /* Primary accent — sky / azure */
+  --brand: #0ea5e9;                      /* sky-500 */
+  --brand-strong: #0284c7;               /* sky-600 */
+  --brand-deep: #0369a1;                 /* sky-700 */
+  --brand-soft: #e0f2fe;                 /* sky-100 */
+  --brand-tint: #f0f9ff;                 /* sky-50 */
+
+  /* Verified (teal) — reserved strictly for human-verified semantics */
+  --verified: #0d9488;
+  --verified-strong: #0f766e;
+
+  --good: #10b981;                       /* emerald-500 */
+  --warn: #d97706;                       /* amber-600 */
+  --bad: #f43f5e;                        /* rose-500 */
+
+  /* Soft, layered shadows tuned to a cool ink */
+  --shadow-card: 0 1px 2px rgb(16 42 67 / 0.04), 0 8px 24px rgb(16 42 67 / 0.06);
+  --shadow-hover: 0 2px 4px rgb(16 42 67 / 0.05), 0 16px 40px rgb(16 42 67 / 0.10);
+  --shadow-sm: 0 1px 2px 0 rgb(16 42 67 / 0.05);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+
+html { scroll-behavior: smooth; }
+
+/* Global page wash — a fixed, non-scrolling sky glow (top-center) over an ultra-faint
+   dot grid. Sits behind all content; pointer-events off. No banding, no heavy gradients. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1200px 500px at 50% -10%, rgb(14 165 233 / 0.08), transparent 60%),
+    radial-gradient(rgb(15 23 42 / 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 24px 24px;
+  background-repeat: no-repeat, repeat;
+}
+
+/* Prevent iOS auto-zoom on input focus (font-size must be >= 16px) */
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px; }
+}
+
+/* Custom xs breakpoint at 380px for very narrow phones */
+@media (min-width: 380px) {
+  .xs\:inline { display: inline; }
+  .xs\:hidden { display: none; }
+}
+
+::selection { background: var(--brand-soft); color: var(--brand-deep); }
+
+/* Typographic polish */
+h1, h2, h3, h4 { letter-spacing: -0.01em; }
+h1 { letter-spacing: -0.02em; }
+
+/* Page wrapper — transparent so the single fixed body wash shows through consistently. */
+.hero-bg {
+  background: transparent;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Surfaces                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;                   /* rounded-2xl */
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.card-interactive { cursor: pointer; }
+.card-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgb(186 230 253 / 0.9);  /* sky-200 */
+}
+
+/* Larger radius for hero / feature panels */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;                 /* rounded-3xl */
+  box-shadow: var(--shadow-card);
+}
+
+/* Tinted header strip inside a card (bottom hairline + subtle sky wash) */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: rgb(240 249 255 / 0.6);    /* sky-50/60 */
+  border-bottom: 1px solid var(--border);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+/* Uppercase section label */
+.section-title {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Chips / badges                                                              */
+/* -------------------------------------------------------------------------- */
+
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 9999px;
+  font-size: 12px; font-weight: 500; line-height: 1.25;
+  background: #f1f5f9; color: var(--text-muted);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.chip-sky {
+  background: var(--brand-tint);
+  color: var(--brand-deep);
+  border-color: #bae6fd;                 /* sky-200 */
+}
+
+/* Eyebrow used on cards / hero */
+.eyebrow {
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Controls                                                                    */
+/* -------------------------------------------------------------------------- */
+
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  background: var(--brand-strong);
+  color: #fff;
+  border-radius: 0.75rem;
+  padding: 10px 18px;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+.btn-primary:hover { background: var(--brand-deep); box-shadow: var(--shadow-card); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  color: var(--brand-deep);
+  border-radius: 0.75rem;
+  padding: 9px 16px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.btn-secondary:hover { background: var(--brand-tint); border-color: #7dd3fc; }
+.btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Form fields — consistent focus ring in sky */
+.field {
+  width: 100%;
+  border-radius: 0.625rem;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field::placeholder { color: #94a3b8; }
+.field:focus {
+  outline: none;
+  border-color: #38bdf8;                 /* sky-400 */
+  box-shadow: 0 0 0 3px rgb(56 189 248 / 0.25);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Animations                                                                  */
+/* -------------------------------------------------------------------------- */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.97) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes typing-dot {
+  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+  30%           { opacity: 1;    transform: translateY(-3px); }
+}
+
+.animate-fade-up  { animation: fade-up 0.35s ease-out both; }
+.animate-slide-in { animation: slide-in-right 0.3s ease-out both; }
+.animate-pop-in   { animation: pop-in 0.15s ease-out both; transform-origin: top center; }
+
+/* Assistant "thinking" indicator — three calm, staggered dots. */
+.typing-dot { animation: typing-dot 1.2s infinite ease-in-out; }
+
+/* Thin, on-palette scrollbar for dropdown panels and scroll regions. */
+.nice-scroll { scrollbar-width: thin; scrollbar-color: #e2e8f0 transparent; }
+.nice-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.nice-scroll::-webkit-scrollbar-track { background: transparent; }
+.nice-scroll::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 9999px; }
+.nice-scroll::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+.shimmer {
+  background: linear-gradient(90deg, #eef2f7 25%, #f8fafc 37%, #eef2f7 63%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .animate-fade-up,
+  .animate-slide-in,
+  .animate-pop-in,
+  .typing-dot,
+  .shimmer {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .card, .card-interactive { transition: none !important; }
+}
+
+/* -------------------------------------------------------------------------- */
+/* MapLibre overrides — keep the map light and on-palette                      */
+/* -------------------------------------------------------------------------- */
+
+.maplibregl-popup-content {
+  color: var(--text);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  font-family: inherit;
+}
+.maplibregl-popup-close-button { display: none; }
+.maplibregl-ctrl-group {
+  border-radius: 0.625rem !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-card) !important;
+  border: 1px solid var(--border) !important;
+}
+.maplibregl-ctrl-group button { width: 32px; height: 32px; }
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.85);
+}
