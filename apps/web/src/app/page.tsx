@@ -119,12 +119,12 @@ export default function AskPage() {
   useEffect(() => { void loadScenarios(); }, [loadScenarios]);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [turns]);
 
-  // Keep the Databricks serverless warehouse warm so the first query never cold-starts.
+  // Warm the Databricks warehouse ONCE when the app opens.
+  // Deliberately NOT on an interval: a periodic ping keeps resetting the warehouse
+  // idle timer (auto_stop_mins=10), so it never auto-stops and burns through the
+  // Free Edition daily compute credit. execSql already retries cold starts.
   useEffect(() => {
-    const ping = () => { void fetch('/api/keepwarm').catch(() => {}); };
-    ping();
-    const id = setInterval(ping, 240_000);
-    return () => clearInterval(id);
+    void fetch('/api/keepwarm').catch(() => {});
   }, []);
 
   const switchTab = useCallback((id: View) => {
